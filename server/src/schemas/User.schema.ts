@@ -8,11 +8,12 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: true })
+  // Select: false means that this field will not be returned in the response by default
+  @Prop({ required: true, select: false })
   password: string;
 
-  @Prop({ default: Date.now })
-  createdAt?: Date;
+  @Prop({ default: Date.now, required: false })
+  createdAt: Date;
 
   @Prop({ reguired: false, default: null })
   refreshToken?: string;

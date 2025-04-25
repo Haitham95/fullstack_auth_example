@@ -4,13 +4,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/schemas/User.schema';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import ViewUserDto from './dto/user_view.dto';
 
 @Injectable()
 export class UsersService {
   // user.service.ts
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<User> {
+  async createUser(createUserDto: CreateUserDto): Promise<ViewUserDto> {
     const { email, password } = createUserDto;
     // lowercase email
     const lowercasedEmail = email.toLowerCase();
@@ -34,6 +35,11 @@ export class UsersService {
       password: hashedPassword,
     });
 
-    return user;
+    return {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      createdAt: user.createdAt,
+    };
   }
 }
