@@ -12,9 +12,10 @@ export class User {
   password: string;
 
   @Prop({ default: Date.now })
-  createdAt: Date;
+  createdAt?: Date;
 
   @Prop({ reguired: false, default: null })
   refreshToken?: string;
 }
 export const UserSchema = SchemaFactory.createForClass(User);
+export type UserDocument = User & Document;
