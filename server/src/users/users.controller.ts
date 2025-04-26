@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -9,7 +10,7 @@ import {
 import { UsersService } from './users.service';
 import CreateUserDto from './dto/create_user.dto';
 import ViewUserDto from './dto/user_view.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -25,9 +26,15 @@ export class UsersController {
     return user;
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Get('/me')
-  async getUserProfile(@Request() req) {
-    console.log(req.user);
+  async getUserProfile(@Request() req): Promise<ViewUserDto> {
+    if (!req.user) {
+      throw new BadRequestException('No user found');
+    }
+
+    const user = await this.usersService.getUserById(req.user.userId);
+
+    return user;
   }
 }

@@ -42,4 +42,19 @@ export class UsersService {
       createdAt: user.createdAt,
     };
   }
+
+  async getUserById(userId: string): Promise<ViewUserDto> {
+    const user = await this.userModel.findById(userId);
+
+    if (!user) {
+      throw new BadRequestException('user with this id does not exist');
+    }
+
+    return {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      createdAt: user.createdAt,
+    };
+  }
 }
