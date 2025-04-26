@@ -124,4 +124,19 @@ export class AuthService {
       email: user.email,
     };
   }
+
+  async logout(userId: string, res: Response): Promise<void> {
+    // Clear the refresh token from the user document
+    await this.userModel.findByIdAndUpdate(userId, {
+      refreshToken: null,
+    });
+
+    // Clear the refresh token cookie
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: true, // true in production (HTTPS)
+      sameSite: 'strict', // CSRF protection
+      path: '/auth/refresh-token', // Specify the path for the cookie
+    });
+  }
 }
