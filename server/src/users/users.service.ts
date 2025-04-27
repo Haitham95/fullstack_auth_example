@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import CreateUserDto from './dto/create_user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/schemas/User.schema';
@@ -10,6 +10,7 @@ import ViewUserDto from './dto/user_view.dto';
 export class UsersService {
   // user.service.ts
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  private readonly logger = new Logger(UsersService.name, { timestamp: true });
 
   async createUser(createUserDto: CreateUserDto): Promise<ViewUserDto> {
     const { email, password } = createUserDto;
@@ -27,6 +28,8 @@ export class UsersService {
 
     // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    this.logger.log(`User with email ${lowercasedEmail} is being created`);
 
     // create user in the database
     const user = await this.userModel.create({

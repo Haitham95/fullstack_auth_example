@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import UserLoginDto from './dto/user_login.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/schemas/User.schema';
@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import UserLoginViewDto from './dto/login_view.dto';
+import { throws } from 'assert';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +17,10 @@ export class AuthService {
     private readonly configService: ConfigService,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
+
+  private readonly logger = new Logger(AuthService.name, {
+    timestamp: true,
+  });
 
   async validateUser(loginDto: UserLoginDto): Promise<UserDocument> {
     const { email, password } = loginDto;
@@ -39,6 +44,9 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
+      this.logger.error(
+        `User with email ${lowercasedEmail} tried to login with wrong password`,
+      );
       throw new BadRequestException('Wrong password');
     }
 
@@ -72,6 +80,13 @@ export class AuthService {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
+    this.logger.log(
+      `User with email ${user.email} logged in successfully. Access token: ${accessToken}`,
+    );
+    this.logger.log(
+      `User with email ${user.email} logged in successfully. Refresh token: ${refreshToken}`,
+    );
+
     return {
       accessToken,
       _id: user._id,
@@ -88,6 +103,9 @@ export class AuthService {
     }
 
     if (!user.refreshToken) {
+      this.logger.error(
+        `User with email ${user.email} tried to refresh token but refresh token is not found`,
+      );
       throw new BadRequestException('user refresh token not found');
     }
 
@@ -130,6 +148,7 @@ export class AuthService {
     await this.userModel.findByIdAndUpdate(userId, {
       refreshToken: null,
     });
+    this.logger.log(`User with id ${userId} logged out successfully`);
 
     // Clear the refresh token cookie
     res.clearCookie('refresh_token', {
@@ -138,5 +157,9 @@ export class AuthService {
       sameSite: 'strict', // CSRF protection
       path: '/auth/refresh-token', // Specify the path for the cookie
     });
+
+    this.logger.log(
+      `User with id ${userId} logged out successfully. Refresh token cleared`,
+    );
   }
 }
