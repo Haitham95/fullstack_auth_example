@@ -22,6 +22,8 @@ The backend follows a modular architecture with the following components:
 
 ## API Endpoints
 
+### Postman testing file: https://drive.google.com/file/d/19ztAbE2BgkUQ15LB8PYBdgqXJUEpIukp/view?usp=sharing
+
 ### Authentication
 
 #### Register User
