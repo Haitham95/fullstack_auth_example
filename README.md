@@ -44,7 +44,13 @@ The project is divided into two main parts:
    JWT_REFRESHTOKEN_SECRET={secret_key_for_refreshToken}
    ```
 
-4. Start the backend server:
+4. Start the mongodb container
+
+```bash
+docker compose up
+```
+
+5. Start the backend server:
 
    ```bash
    npm run start:dev
@@ -86,5 +92,5 @@ The project is divided into two main parts:
 
 For more detailed documentation:
 
-- [Backend Documentation](./backend/README.md)
-- [Frontend Documentation](./frontend/README.md)
+- [Backend Documentation](./server/README.md)
+- [Frontend Documentation](./app/README.md)

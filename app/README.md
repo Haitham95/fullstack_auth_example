@@ -147,15 +147,44 @@ apiClient.interceptors.request.use((config) => {
 Forms are validated using Zod schemas:
 
 ```typescript
-const loginSchema = yup.object({
-  email: yup
+// Password validation regex
+const PASSWORD_REGEX =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+// Sign up schema
+const signUpSchema = z
+  .object({
+    name: z
+      .string()
+      .min(3, { message: "Name must be at least 3 characters long" })
+      .trim(),
+    email: z
+      .string()
+      .email({ message: "Invalid email address" })
+      .trim()
+      .toLowerCase(),
+    password: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters long" })
+      .regex(PASSWORD_REGEX, {
+        message:
+          "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+      }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
+
+// Sign in schema
+const signInSchema = z.object({
+  email: z
     .string()
-    .email("Enter a valid email")
-    .required("Email is required"),
-  password: yup
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .required("Password is required"),
+    .email({ message: "Invalid email address" })
+    .trim()
+    .toLowerCase(),
+  password: z.string().min(1, { message: "Password is required" }),
 });
 ```
 
@@ -172,20 +201,12 @@ try {
 }
 ```
 
-## Environment Variables
-
-The frontend uses environment variables for configuration. Create a `.env` file with:
-
-```
-REACT_APP_API_URL=http://localhost:3001
-```
-
 ## Development
 
 ### Running the Development Server
 
 ```bash
-npm start
+npm start run
 ```
 
 ### Building for Production
@@ -209,6 +230,5 @@ The application uses Tailwind CSS for styling. Custom styles can be added in the
 - Use TypeScript for type safety
 - Separate logic from presentation
 - Keep components small and focused
-- Use custom hooks for reusable logic
 - Handle errors gracefully
 - Validate forms on both client and server
