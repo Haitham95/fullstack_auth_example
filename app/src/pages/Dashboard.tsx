@@ -4,13 +4,7 @@ import { Container } from "../components/common/Container";
 import { Button } from "../components/common/Button";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
-
-interface UserData {
-  _id: string;
-  name: string;
-  email: string;
-  createdAt: string;
-}
+import { UserData } from "../types/auth.types";
 
 const Dashboard: React.FC = () => {
   const { signOut } = useAuth();

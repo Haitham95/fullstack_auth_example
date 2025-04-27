@@ -1,4 +1,12 @@
 // src/types/auth.types.ts
+
+export interface UserData {
+  _id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+}
+
 export interface User {
   id: string;
   name: string;
